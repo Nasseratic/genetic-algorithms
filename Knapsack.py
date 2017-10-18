@@ -1,4 +1,4 @@
-file = open("input.txt", "r") 
+import knapsack_genetic_algorithm as GA
 
 casses = []
 class Individul:
@@ -24,7 +24,9 @@ casses =
 """
 
 
+# ---------------------- get cases from the file  ---------------
 
+file = open("input.txt", "r") 
 numOfCases = int ( file.readline() )
 for iCases in range(0 , numOfCases):
 
@@ -42,3 +44,16 @@ for iCases in range(0 , numOfCases):
     # to ignore extra end lines
     file.readline()
     file.readline()
+# ------------------------------------------------------------------
+
+
+# ------------- main ----------------
+
+for  i , case in enumerate(casses):
+    selectedChromosome = GA.select_chromosome(case['size'] , case['items'])
+    result = GA.chromosome_to_items(case['items'] , selectedChromosome)
+    print('case %s :' % i)    
+    print('Total benefit %s'% (GA.get_total_benefit(result)))
+    for item in result:
+        print( item.weight , item.benefit )
+    print('\n')
