@@ -47,16 +47,16 @@ def select_chromosome( CAPACITY  , ITEMS , GEN_MAX = 200 , POP_SIZE = 70):
 
     # ---------------------------------------------
 
-    def GA(population,  prop_of_survival = 0.2, prop_of_mutation = 0.08, prop_of_crossover = 0.05):
+    def GA(population,  prop_of_crossover = 0.2, prop_of_mutation = 0.08, prop_of_survival = 0.05):
     
 
-        parent_length = int(prop_of_survival*len(population))
-        survivals = population[:parent_length]
-        nonparents = population[parent_length:]
+        parent_length = int(prop_of_crossover*len(population))
+        survivals = population[len(population) - parent_length:]
+        nonparents = population[: len(population) - parent_length]
 
         # Parent selection!
         for np in nonparents:
-            if prop_of_crossover > random.random():
+            if prop_of_survival > random.random():
                 survivals.append(np)
 
         # parents mutation
@@ -87,10 +87,10 @@ def select_chromosome( CAPACITY  , ITEMS , GEN_MAX = 200 , POP_SIZE = 70):
     population = generate_starting_population(POP_SIZE)
     for g in range(0,GEN_MAX):
         #print "Generation %d with %d" % (generation,len(population))
-        population = sorted(population, key=lambda x: fitness(x), reverse=True)
         # for i in population:        
         #     print "%s, fitness equal  %s" % (str(i), fitness(i))        
         population = GA(population)
+        population = sorted(population, key=lambda x: fitness(x), reverse=True)
         generation += 1
     return population[0]
 
