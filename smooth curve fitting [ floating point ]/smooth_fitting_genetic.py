@@ -1,55 +1,35 @@
 import random as random
 
-def get_total_benefit(items):
-    total_benefit = 0
-    for item in items:
-        total_benefit += item.benefit
-    return total_benefit
- 
-def select_chromosome( CAPACITY  , ITEMS , GEN_MAX = 200 , POP_SIZE = 70):
+
+def select_chromosome( POINTS ,  DEGREE = 3 , GEN_MAX = 200 , POP_SIZE = 70):
+    chromosome_len = DEGREE+1
+    def get_total_benefit(items):
+        total_benefit = 0.0
+        for item in items:
+            total_benefit += item.benefit
+        return total_benefit
 
     def fitness(individual):
         #Compute the fitness of individual
-        total_benefit = 0
-        total_weight = 0
-        index = 0
-        for i in individual:        
-            if index >= len(ITEMS):
-                break
-            if (i == 1):
-                total_benefit += ITEMS[index].benefit
-                total_weight += ITEMS[index].weight
-            index += 1
-            
-        
-        if total_weight > CAPACITY:
-            return 0
-        else:
-            return total_benefit
-
+        mse = 0
+        for point in POINTS :
+            for power in range(0,chromosome_len):
+                fx = ( individual[power] * (point.x ** power) )   
+            mse =+ ( ( fx - point.y ) ** 2 )
+        return mse
 
     def generate_starting_population(POP_SIZE):
         return [generate_individual() for x in range (0,POP_SIZE)]
 
     def generate_individual():
-        return [random.randint(0,1) for x in range (0,len(ITEMS))]
+        return [random.uniform( -10.0 , 10.0 ) for x in range (0,len(chromosome_len))]
 
-
-
-    def mutate(target):
-        #Do mutation
-        r = random.randint(0,len(target)-1)
-        if target[r] == 1:
-            target[r] = 0
-        else:
-            target[r] = 1
-
-
-    # ---------------------------------------------
+    def none_uniform_mutate(target):
+        # TODO
+        # non-uniform mutation
+        return 0
 
     def GA(population,  prop_of_crossover = 0.2, prop_of_mutation = 0.08, prop_of_survival = 0.05):
-    
-
         parent_length = int(prop_of_crossover*len(population))
         survivals = population[len(population) - parent_length:]
         nonparents = population[: len(population) - parent_length]
@@ -80,24 +60,11 @@ def select_chromosome( CAPACITY  , ITEMS , GEN_MAX = 200 , POP_SIZE = 70):
         new_population.extend(offsprings)
         return new_population
 
-
-    # -------------------------------
-
     generation = 1
     population = generate_starting_population(POP_SIZE)
     for g in range(0,GEN_MAX):
-        #print "Generation %d with %d" % (generation,len(population))
-        # for i in population:        
-        #     print "%s, fitness equal  %s" % (str(i), fitness(i))        
+        population = sorted(population, key=lambda x: fitness(x), reverse=False)
         population = GA(population)
-        population = sorted(population, key=lambda x: fitness(x), reverse=True)
         generation += 1
+    population = sorted(population, key=lambda x: fitness(x), reverse=False)
     return population[0]
-
-
-def chromosome_to_items( items , chromosome):
-    result = []
-    for index, gene in enumerate(chromosome):
-        if(gene == 1 ):
-            result.append(items[index])
-    return result
